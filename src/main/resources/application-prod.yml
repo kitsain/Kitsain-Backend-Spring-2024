@@ -1,3 +1,5 @@
+server:
+    port: 8080
 minio:
     accessKey: minioadmin
     bucket:
@@ -11,10 +13,8 @@ minio:
     secretKey: minioadmin
     secure: false
 spring:
-    config:
-        import: optional:classpath:.env[.properties]
     datasource:
-        password: ${MYSQL_PASSWORD}
+        password: P@ssword*123
         url: jdbc:postgresql://nocng.id.vn:5432/blogs_prod?currentSchema=blog_dbo
         username: dev
     flyway:
@@ -24,7 +24,7 @@ spring:
     jpa:
         generate-ddl: true
         hibernate:
-            ddl-auto: validate
+            ddl-auto: update
         properties:
             hibernate:
                 dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -50,15 +50,21 @@ spring:
 # Email Sender
 email:
     registration-confirmation:
-        template: registration-confirmation.html
+        template: registration-confirmation-en.html
         subject: Registration Confirmation
-        from: noreply@pezzie.com
-        base-url: http://localhost:8080/user/api/v1/auth/regitrationConfirm?token=%s
-
+        from: noreply@anonymous.com
+        base-url: http://nocng.id.vn:9090/api/v1/auth/registrationConfirm?token=%s
 app:
     generate-categories: true
+
 flywaypf:
     active: blog_dbo
-
+#
+#springdoc:
+#    api-docs:
+#        enabled: false
+#    swagger-ui:
+#        enabled: false
+# For development
 logging:
-    config: classpath:log4j2-spring-prod.xml
+    config: classpath:log4j2-spring-dev.xml
