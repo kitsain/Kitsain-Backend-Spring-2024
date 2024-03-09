@@ -60,20 +60,6 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostResponse getPostById(final UUID id) {
-        try {
-            var post = postRepository
-                    .findById(id)
-                    .orElseThrow(() -> new BlogRuntimeException(ErrorCode.ID_NOT_FOUND));
-            logger.error("Get post successfully by id {} ", id);
-            return postMapper.toPostResponse(post);
-        } catch (Exception e) {
-            logger.error("Failed to get post by id", e);
-            throw new RuntimeException("Failed to get post by id");
-        }
-    }
-
-    @Override
     public PostResponse updatePost(final UUID id, final PostRequest postRequest) {
         try {
             var post = postRepository.findById(id)
@@ -86,6 +72,20 @@ public class PostServiceImpl implements PostService {
         } catch (Exception e) {
             logger.error("Failed to update post by id", e);
             throw new RuntimeException("Failed to update post by id");
+        }
+    }
+
+    @Override
+    public PostResponse getPostById(final UUID id) {
+        try {
+            var post = postRepository
+                    .findById(id)
+                    .orElseThrow(() -> new BlogRuntimeException(ErrorCode.ID_NOT_FOUND));
+            logger.error("Get post successfully by id {} ", id);
+            return postMapper.toPostResponse(post);
+        } catch (Exception e) {
+            logger.error("Failed to get post by id", e);
+            throw new RuntimeException("Failed to get post by id");
         }
     }
 
