@@ -6,7 +6,7 @@ node("master") {
     cleanWs()
 
     stage('Clone Repo') {
-      git url: 'https://gitlab.com/tuanbeovnn/blog_v2.git',
+      git url: 'https://github.com/tuanbeovnn/Tampere_Software_ProjectV2.git',
         credentialsId: 'blogs',
         branch: 'main'
     }
