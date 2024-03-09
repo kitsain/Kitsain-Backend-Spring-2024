@@ -1,6 +1,5 @@
 package com.myblogbackend.blog.post;
 
-import com.myblogbackend.blog.repositories.CategoryRepository;
 import com.myblogbackend.blog.repositories.PostRepository;
 import com.myblogbackend.blog.repositories.UsersRepository;
 import org.junit.Test;

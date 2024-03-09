@@ -1,7 +1,5 @@
 package com.myblogbackend.blog.category;
 
-import com.myblogbackend.blog.models.CategoryEntity;
-import com.myblogbackend.blog.request.CategoryRequest;
 import com.myblogbackend.blog.response.CategoryResponse;
 
 import java.util.UUID;

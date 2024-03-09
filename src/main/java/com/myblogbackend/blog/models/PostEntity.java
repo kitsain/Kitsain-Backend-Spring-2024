@@ -35,14 +35,9 @@ public class PostEntity extends BaseEntity {
     private String status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name ="category_id" )
-    private CategoryEntity category;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name ="user_id" )
+    @JoinColumn(name = "user_id")
     private UserEntity user;
 
-    // One-to-Many relationship with Comments table
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<CommentEntity> comments;
 

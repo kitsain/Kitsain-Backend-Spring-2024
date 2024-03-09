@@ -1,6 +1,5 @@
 package com.myblogbackend.blog.fakers;
 
-import com.myblogbackend.blog.repositories.CategoryRepository;
 import com.myblogbackend.blog.repositories.PostRepository;
 import com.myblogbackend.blog.services.PostService;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +16,6 @@ public class GeneratePostsCommand implements CommandLineRunner {
     private final PostService postService;
     private final Environment environment;
     private final PostRepository postRepository;
-    private final CategoryRepository categoryRepository;
 
 
     @Override

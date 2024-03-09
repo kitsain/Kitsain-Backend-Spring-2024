@@ -16,6 +16,8 @@ public enum ErrorCode implements CommonErrorCode {
     ALREADY_EXIST(HttpStatus.BAD_REQUEST, "Account already exist!"),
     USER_NAME_PASSWORD_NOT_MATCH(HttpStatus.BAD_REQUEST, "Username or password not match!"),
     USER_ACCOUNT_IS_NOT_ACTIVE(HttpStatus.UNAUTHORIZED, "Account has not active yet"),
+
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "Account could not found"),
     JWT_CLAIM_EMPTY(HttpStatus.UNAUTHORIZED, "Claim empty"),
     ACCOUNT_NEEDS_TO_VERIFY(HttpStatus.BAD_REQUEST, "Account needs to verify"),
     EMAIL_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "error.could not send email");

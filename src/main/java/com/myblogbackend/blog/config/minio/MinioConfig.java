@@ -14,10 +14,6 @@ public class MinioConfig {
     private Integer port;
     private String accessKey;
     private String secretKey;
-
-    /**
-     * //" If it is true, It uses https instead of http, The default value is true"
-     */
     private boolean secure;
     private String bucketName;
     private long imageSize;

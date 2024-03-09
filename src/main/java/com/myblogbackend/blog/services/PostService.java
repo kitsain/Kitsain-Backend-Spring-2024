@@ -9,8 +9,6 @@ import java.util.UUID;
 public interface PostService {
     PaginationPage<PostResponse> getAllPostsByUserId(Integer offset, Integer limited, UUID userId);
 
-    PaginationPage<PostResponse> getAllPostsByCategoryId(Integer offset, Integer limited, UUID categoryId);
-
     PostResponse getPostById(UUID id);
 
     PostResponse createPost(PostRequest postRequest);

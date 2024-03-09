@@ -25,15 +25,10 @@ public class FilesController {
 
     @PostMapping("/upload")
     public FileResponse uploadFile(final MultipartFile file, final String bucketName) {
-
         LOGGER.info("MinioController | uploadFile is called");
-
         LOGGER.info("MinioController | uploadFile | bucketName : " + bucketName);
-
         String fileType = FileTypeUtils.getFileType(file);
-
         LOGGER.info("MinioController | uploadFile | fileType : " + fileType);
-
         if (fileType != null) {
             return minioService.putObject(file, bucketName, fileType);
         }

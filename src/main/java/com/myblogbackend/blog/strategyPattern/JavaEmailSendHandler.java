@@ -35,7 +35,7 @@ public class JavaEmailSendHandler {
         );
 
         mimeMessageHelper.setSubject(Optional.ofNullable(simpleMailMessage.getSubject()).orElseThrow());
-        mimeMessageHelper.setFrom(Optional.ofNullable(simpleMailMessage.getFrom()).orElseThrow(), "MONKEY BLOGS");
+        mimeMessageHelper.setFrom(Optional.ofNullable(simpleMailMessage.getFrom()).orElseThrow(), "noreply@anonymous.com");
         mimeMessageHelper.setTo(Optional.ofNullable(simpleMailMessage.getTo()).orElseThrow());
         mimeMessageHelper.setText(parsedHTML, true);
 

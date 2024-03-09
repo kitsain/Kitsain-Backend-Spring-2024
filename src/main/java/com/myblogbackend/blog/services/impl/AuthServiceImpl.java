@@ -144,7 +144,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public JwtResponse userLogin(final LoginFormRequest loginRequest) {
         var userEntity = usersRepository.findByEmail(loginRequest.getEmail())
-                .orElseThrow(() -> new RuntimeException("Fail! -> Cause: User not found."));
+                .orElseThrow(() -> new BlogRuntimeException(ErrorCode.USER_NOT_FOUND));
 
         if (userEntity.getActive()) {
             throw new BlogRuntimeException(ErrorCode.USER_ACCOUNT_IS_NOT_ACTIVE);
