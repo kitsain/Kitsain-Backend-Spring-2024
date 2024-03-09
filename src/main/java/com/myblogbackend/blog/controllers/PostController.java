@@ -18,9 +18,16 @@ import java.util.UUID;
 public class PostController {
     private final PostService postService;
 
-    @PostMapping("/posts")
-    public ResponseEntity<?> createPost(@RequestBody final PostRequest postRequest) {
-        PostResponse post = postService.createPost(postRequest);
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getPostById(@PathVariable(value = "id") final UUID id) {
+        var post = postService.getPostById(id);
+        return ResponseEntity.ok(post);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updatePost(@PathVariable(value = "id") final UUID id,
+                                        final PostRequest postRequest) {
+        var post = postService.updatePost(id, postRequest);
         return ResponseEntity.ok(post);
     }
 
@@ -34,16 +41,9 @@ public class PostController {
                 .build();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getPostById(@PathVariable(value = "id") final UUID id) {
-        var post = postService.getPostById(id);
-        return ResponseEntity.ok(post);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updatePost(@PathVariable(value = "id") final UUID id,
-                                        final PostRequest postRequest) {
-        var post = postService.updatePost(id, postRequest);
+    @PostMapping("/posts")
+    public ResponseEntity<?> createPost(@RequestBody final PostRequest postRequest) {
+        PostResponse post = postService.createPost(postRequest);
         return ResponseEntity.ok(post);
     }
 

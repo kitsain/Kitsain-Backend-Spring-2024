@@ -14,20 +14,21 @@ import java.util.UUID;
 @RequestMapping(CommonRoutes.BASE_API + CommonRoutes.VERSION + CommentRoutes.BASE_URL)
 @RequiredArgsConstructor
 public class CommentController {
+
     private final CommentService commentService;
+
+    @GetMapping("/{postId}")
+    public ResponseEntity<?> getListCommentsByPostId(
+            @RequestParam(name = "limit", defaultValue = "10") final Integer limit,
+            @RequestParam(name = "offset", defaultValue = "0") final Integer offset,
+            @PathVariable(value = "postId") final UUID postId) {
+        var commentResponseList = commentService.getListCommentsByPostId(offset, limit, postId);
+        return ResponseEntity.ok(commentResponseList);
+    }
 
     @PostMapping
     public ResponseEntity<?> createComment(final CommentRequest commentRequest) {
         var commentResponse = commentService.createComment(commentRequest);
         return ResponseEntity.ok(commentResponse);
-    }
-
-    @GetMapping("/{postId}")
-    public ResponseEntity<?> getListCommentsByPostId(
-            @RequestParam(name = "offset", defaultValue = "0") final Integer offset,
-            @RequestParam(name = "limit", defaultValue = "10") final Integer limit,
-            @PathVariable(value = "postId") final UUID postId) {
-        var commentResponseList = commentService.getListCommentsByPostId(offset, limit, postId);
-        return ResponseEntity.ok(commentResponseList);
     }
 }
