@@ -42,7 +42,7 @@ public class PostServiceImpl implements PostService {
             return postMapper.toPostResponse(createdPost);
         } catch (Exception e) {
             logger.error("Failed to create post", e);
-            throw new RuntimeException("Failed to create post");
+            throw new RuntimeException("Failed to create post testing");
         }
     }
 
