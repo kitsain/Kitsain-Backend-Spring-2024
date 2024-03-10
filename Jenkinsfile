@@ -8,7 +8,7 @@ node("master") {
     stage('Clone Repo') {
       git url: 'https://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@github.com/kitsain/Kitsain-Backend-Spring-2024.git',
         credentialsId: 'blogs',
-        branch: 'main'
+        branch: 'dev'
     }
 
     stage('Run check style') {
