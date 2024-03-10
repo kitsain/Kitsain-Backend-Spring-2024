@@ -24,13 +24,6 @@ public class PostController {
         return ResponseEntity.ok(post);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updatePost(@PathVariable(value = "id") final UUID id,
-                                        final PostRequest postRequest) {
-        var post = postService.updatePost(id, postRequest);
-        return ResponseEntity.ok(post);
-    }
-
     @GetMapping("/users/{userId}")
     public ResponseEntity<?> getAllPostsByUserId(@RequestParam(name = "offset", defaultValue = "0") final Integer offset,
                                                  @RequestParam(name = "limit", defaultValue = "10") final Integer limit, @PathVariable final UUID userId) {
