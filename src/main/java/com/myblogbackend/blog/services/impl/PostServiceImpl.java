@@ -71,7 +71,7 @@ public class PostServiceImpl implements PostService {
             return postMapper.toPostResponse(updatedPost);
         } catch (Exception e) {
             logger.error("Failed to update post by id", e);
-            throw new RuntimeException("Failed to update post by id test 2");
+            throw new RuntimeException("Failed to update post by id");
         }
     }
 
