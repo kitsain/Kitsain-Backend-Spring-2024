@@ -28,31 +28,28 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request,
-                                        HttpServletResponse response,
-                                        Authentication authentication) throws IOException {
-
+    public void onAuthenticationSuccess(final HttpServletRequest request,
+                                        final HttpServletResponse response,
+                                        final Authentication authentication) throws IOException {
 
         String targetUrl = determineTargetUrl(request, response, authentication);
-
         if (response.isCommitted()) {
             logger.debug("Response has already been committed. Unable to redirect to " + targetUrl);
             return;
         }
-
         clearAuthenticationAttributes(request, response);
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 
-    protected void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {
+    protected void clearAuthenticationAttributes(final HttpServletRequest request, final HttpServletResponse response) {
         super.clearAuthenticationAttributes(request);
         httpCookieOAuth2AuthorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
     }
 
     @Override
-    protected String determineTargetUrl(HttpServletRequest request,
-                                        HttpServletResponse response,
-                                        Authentication authentication) {
+    protected String determineTargetUrl(final HttpServletRequest request,
+                                        final HttpServletResponse response,
+                                        final Authentication authentication) {
         var redirectUri = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
                 .map(Cookie::getValue);
 
@@ -69,7 +66,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                 .build().toUriString();
     }
 
-    private boolean isAuthorizedRedirectUri(String uri) {
+    private boolean isAuthorizedRedirectUri(final String uri) {
         var clientRedirectUri = URI.create(uri);
 
         return oAuth2Properties.getAuthorizedRedirectUris().stream()

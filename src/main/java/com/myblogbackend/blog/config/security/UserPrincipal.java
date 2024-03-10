@@ -22,11 +22,12 @@ public class UserPrincipal implements OAuth2User, UserDetails {
     private final String password;
     private Map<String, Object> attributes;
 
-    public static UserPrincipal create(UserEntity user, Map<String, Object> attributes) {
+    public static UserPrincipal create(final UserEntity user, final Map<String, Object> attributes) {
         UserPrincipal userPrincipal = UserPrincipal.build(user);
         userPrincipal.setAttributes(attributes);
         return userPrincipal;
     }
+
     public UserPrincipal(final UUID id, final String email, final String password) {
         this.id = id;
         this.email = email;

@@ -30,11 +30,11 @@ public enum OAuth2Provider {
         }
     }
 
-    public static OAuth2Provider findByRegistrationId(String registrationId) {
+    public static OAuth2Provider findByRegistrationId(final String registrationId) {
         return PROVIDERS.get(registrationId);
     }
 
-    public static OAuth2UserInfo getOAuth2UserInfo(String registrationId, Map<String, Object> attributes) {
+    public static OAuth2UserInfo getOAuth2UserInfo(final String registrationId, final Map<String, Object> attributes) {
         if (registrationId.equalsIgnoreCase(OAuth2Provider.GOOGLE.getProvider())) {
             return new OAuth2GoogleUserInfo(attributes);
         }

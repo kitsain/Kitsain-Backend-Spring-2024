@@ -6,14 +6,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.experimental.UtilityClass;
 import org.springframework.util.SerializationUtils;
 
-
 import java.util.Base64;
 import java.util.Optional;
 
 @UtilityClass
 public class CookieUtils {
 
-    public static Optional<Cookie> getCookie(HttpServletRequest request, String name) {
+    public static Optional<Cookie> getCookie(final HttpServletRequest request, final String name) {
         Cookie[] cookies = request.getCookies();
 
         if (cookies != null) {
@@ -27,7 +26,7 @@ public class CookieUtils {
         return Optional.empty();
     }
 
-    public static void addCookie(HttpServletResponse response, String name, String value, int maxAge) {
+    public static void addCookie(final HttpServletResponse response, final String name, final String value, final int maxAge) {
         Cookie cookie = new Cookie(name, value);
         cookie.setPath("/");
         cookie.setHttpOnly(true);
@@ -35,7 +34,7 @@ public class CookieUtils {
         response.addCookie(cookie);
     }
 
-    public static void deleteCookie(HttpServletRequest request, HttpServletResponse response, String name) {
+    public static void deleteCookie(final HttpServletRequest request, final HttpServletResponse response, final String name) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
@@ -49,12 +48,12 @@ public class CookieUtils {
         }
     }
 
-    public static String serialize(Object object) {
+    public static String serialize(final Object object) {
         return Base64.getUrlEncoder()
                 .encodeToString(SerializationUtils.serialize(object));
     }
 
-    public static <T> T deserialize(Cookie cookie, Class<T> cls) {
+    public static <T> T deserialize(final Cookie cookie, final Class<T> cls) {
         return cls.cast(SerializationUtils.deserialize(
                 Base64.getUrlDecoder().decode(cookie.getValue())));
     }

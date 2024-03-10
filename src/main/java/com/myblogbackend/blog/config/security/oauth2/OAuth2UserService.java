@@ -22,12 +22,12 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
     private final UsersRepository userRepository;
 
     @Override
-    public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
+    public OAuth2User loadUser(final OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
         var oAuth2User = super.loadUser(oAuth2UserRequest);
         return proceedOAuth2User(oAuth2UserRequest, oAuth2User);
     }
 
-    private OAuth2User proceedOAuth2User(OAuth2UserRequest oAuth2UserRequest, OAuth2User oAuth2User) {
+    private OAuth2User proceedOAuth2User(final OAuth2UserRequest oAuth2UserRequest, final OAuth2User oAuth2User) {
         var provider = oAuth2UserRequest.getClientRegistration().getRegistrationId();
 
         var oAuth2UserInfo =
@@ -55,7 +55,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         return UserPrincipal.create(user, oAuth2User.getAttributes());
     }
 
-    private UserEntity signUpNewAccount(OAuth2UserRequest oAuth2UserRequest, OAuth2UserInfo oAuth2UserInfo) {
+    private UserEntity signUpNewAccount(final OAuth2UserRequest oAuth2UserRequest, final OAuth2UserInfo oAuth2UserInfo) {
         var user = new UserEntity();
         user.setProvider(OAuth2Provider.findByRegistrationId(oAuth2UserRequest.getClientRegistration().getRegistrationId()));
         user.setEmail(oAuth2UserInfo.getEmail());
