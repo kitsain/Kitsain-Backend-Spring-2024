@@ -60,22 +60,6 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostResponse updatePost(final UUID id, final PostRequest postRequest) {
-        try {
-            var post = postRepository.findById(id)
-                    .orElseThrow(() -> new BlogRuntimeException(ErrorCode.ID_NOT_FOUND));
-            post.setTitle(postRequest.getTitle());
-            post.setContent(postRequest.getContent());
-            var updatedPost = postRepository.save(post);
-            logger.info("Update post successfully with id {} ", id);
-            return postMapper.toPostResponse(updatedPost);
-        } catch (Exception e) {
-            logger.error("Failed to update post by id", e);
-            throw new RuntimeException("Failed to update post by id");
-        }
-    }
-
-    @Override
     public PostResponse getPostById(final UUID id) {
         try {
             var post = postRepository
