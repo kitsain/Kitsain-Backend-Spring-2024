@@ -31,7 +31,10 @@ spring:
                 jdbc:
                     lob:
                         non_contextual_creation: true
-        show-sql: true
+        show-sql: false
+    mvc:
+        pathmatch:
+            matching-strategy: ant_path_matcher
     mail:
         host: smtp.gmail.com
         username: translatorvamkv1@gmail.com
@@ -46,6 +49,20 @@ spring:
                         enable: true
                     timeout: 5000
                     writetimeout: 5000
+    security:
+        oauth2:
+            client:
+                registration:
+                    google:
+                        clientId: 28179558203-kdugdkjaiuljem1ornmiobdua124kok7.apps.googleusercontent.com
+                        clientSecret: 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
+                        redirect-uri: 'http://nocng.id.vn:9090/oauth2/callback/google'
+                        scope:
+                            - email
+                            - profile
+oauth2:
+    authorizedRedirectUris:
+        - http://localhost:3000/oauth2/
 
 # Email Sender
 email:

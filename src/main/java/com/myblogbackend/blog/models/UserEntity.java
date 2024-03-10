@@ -56,7 +56,6 @@ public class UserEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private OAuth2Provider provider;
 
-    // One-to-Many relationship with Comments table
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<CommentEntity> comments;
 

@@ -34,9 +34,7 @@ public class UserServiceImpl implements UserService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final UsersRepository usersRepository;
-
     private final UserMapper userMapper;
-
     private final UserTokenRepository tokenRepository;
 
     @Override

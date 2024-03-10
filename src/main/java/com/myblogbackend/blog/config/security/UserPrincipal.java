@@ -4,24 +4,29 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.myblogbackend.blog.models.UserEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.io.Serial;
 import java.util.*;
 
-public class UserPrincipal implements UserDetails {
+public class UserPrincipal implements OAuth2User, UserDetails {
     @Serial
     private static final long serialVersionUID = 1L;
 
     private final UUID id;
 
+    private String name;
 
     private final String email;
-
     @JsonIgnore
     private final String password;
-
     private Map<String, Object> attributes;
 
+    public static UserPrincipal create(UserEntity user, Map<String, Object> attributes) {
+        UserPrincipal userPrincipal = UserPrincipal.build(user);
+        userPrincipal.setAttributes(attributes);
+        return userPrincipal;
+    }
     public UserPrincipal(final UUID id, final String email, final String password) {
         this.id = id;
         this.email = email;
@@ -94,5 +99,9 @@ public class UserPrincipal implements UserDetails {
 
     public void setAttributes(final Map<String, Object> attributes) {
         this.attributes = attributes;
+    }
+
+    public String getName() {
+        return name;
     }
 }
