@@ -16,3 +16,14 @@ spring:
         console:
             enabled: true
             path: /h2-console
+    security:
+        oauth2:
+            client:
+                registration:
+                    google:
+                        clientId: 28179558203-kdugdkjaiuljem1ornmiobdua124kok7.apps.googleusercontent.com
+                        clientSecret: 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
+                        redirect-uri: 'http://localhost:8080/oauth2/callback/google'
+                        scope:
+                            - email
+                            - profile
