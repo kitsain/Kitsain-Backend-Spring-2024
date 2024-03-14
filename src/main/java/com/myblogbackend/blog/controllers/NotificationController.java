@@ -7,6 +7,7 @@ import com.myblogbackend.blog.request.DeviceNotificationRequest;
 import com.myblogbackend.blog.request.NotificationSubscriptionRequest;
 import com.myblogbackend.blog.request.TopicNotificationRequest;
 import com.myblogbackend.blog.services.impl.NotificationService;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.concurrent.ExecutionException;
 
+@Hidden
 @RestController
 @RequestMapping("/api/v1/notifications")
 @RequiredArgsConstructor
