@@ -88,7 +88,7 @@ public class MinioServiceImpl implements MinioService {
     private FileResponse buildFileResponse(final String bucketName, final String objectName, final long fileSize,
                                            final String fileType, final LocalDateTime createdTime) {
         return FileResponse.builder()
-                .filename(buildObjectUrl(bucketName, objectName))
+                .filename(objectName)
                 .fileSize(fileSize)
                 .contentType(fileType)
                 .createdTime(createdTime)

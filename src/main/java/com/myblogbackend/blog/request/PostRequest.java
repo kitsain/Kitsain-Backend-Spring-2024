@@ -3,6 +3,9 @@ package com.myblogbackend.blog.request;
 
 import lombok.*;
 
+import java.util.Date;
+import java.util.List;
+
 @Getter
 @Setter
 @Builder
@@ -10,5 +13,8 @@ import lombok.*;
 @AllArgsConstructor
 public class PostRequest {
     private String title;
-    private String content;
+    private String description;
+    private String price;
+    private List<String> images;
+    private Date expringDate;
 }

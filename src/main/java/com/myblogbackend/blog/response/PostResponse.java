@@ -2,6 +2,8 @@ package com.myblogbackend.blog.response;
 
 import lombok.*;
 
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -12,5 +14,8 @@ import java.util.UUID;
 public class PostResponse {
     private UUID id;
     private String title;
-    private String content;
+    private String description;
+    private List<String> images;
+    private String price;
+    private Date expringDate;
 }

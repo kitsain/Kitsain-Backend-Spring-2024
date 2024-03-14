@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,17 +23,20 @@ public class PostEntity extends BaseEntity {
     @Column(columnDefinition = "uuid", updatable = false, nullable = false)
     private UUID id;
 
-    @Column
+    @Column(name = "title")
     private String title;
 
-    @Column
-    private String content;
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
 
-    @Column
-    private Boolean approved;
+    @Column(name = "images", columnDefinition = "TEXT")
+    private String images;
 
-    @Column(name = "status")
-    private String status;
+    @Column(name = "expring_date")
+    private Date expringDate;
+
+    @Column(name = "price")
+    private String price;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
