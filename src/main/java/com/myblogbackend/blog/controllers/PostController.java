@@ -18,7 +18,7 @@ import java.util.UUID;
 public class PostController {
     private final PostService postService;
 
-    @GetMapping("/user/posts")
+    @GetMapping("/user")
     public ResponseEntity<?> getAllPostsByUserId(@RequestParam(name = "offset", defaultValue = "0") final Integer offset,
                                                  @RequestParam(name = "limit", defaultValue = "10") final Integer limit) {
         var postList = postService.getAllPostsByUserId(offset, limit);
