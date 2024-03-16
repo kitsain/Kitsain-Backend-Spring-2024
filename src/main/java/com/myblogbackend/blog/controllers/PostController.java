@@ -3,9 +3,9 @@ package com.myblogbackend.blog.controllers;
 import com.myblogbackend.blog.controllers.route.CommonRoutes;
 import com.myblogbackend.blog.controllers.route.PostRoutes;
 import com.myblogbackend.blog.request.PostRequest;
-import com.myblogbackend.blog.response.PostResponse;
 import com.myblogbackend.blog.response.ResponseEntityBuilder;
 import com.myblogbackend.blog.services.PostService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,10 +18,10 @@ import java.util.UUID;
 public class PostController {
     private final PostService postService;
 
-    @GetMapping("/users/{userId}")
+    @GetMapping("/user/posts")
     public ResponseEntity<?> getAllPostsByUserId(@RequestParam(name = "offset", defaultValue = "0") final Integer offset,
-                                                 @RequestParam(name = "limit", defaultValue = "10") final Integer limit, @PathVariable final UUID userId) {
-        var postList = postService.getAllPostsByUserId(offset, limit, userId);
+                                                 @RequestParam(name = "limit", defaultValue = "10") final Integer limit) {
+        var postList = postService.getAllPostsByUserId(offset, limit);
         return ResponseEntityBuilder
                 .getBuilder()
                 .setDetails(postList)
@@ -35,12 +35,21 @@ public class PostController {
     }
 
     @PostMapping("/posts")
-    public ResponseEntity<?> createPost(@RequestBody final PostRequest postRequest) {
-        PostResponse post = postService.createPost(postRequest);
+    public ResponseEntity<?> createPost(@RequestBody @Valid final PostRequest postRequest) {
+        var post = postService.createPost(postRequest);
         return ResponseEntityBuilder
                 .getBuilder()
                 .setDetails(post)
                 .build();
     }
+
+    @PutMapping("/{postId}")
+    public ResponseEntity<?> updatePost(@PathVariable final UUID postId, @RequestBody @Valid final PostRequest request) {
+        var post = postService.updatePost(postId, request);
+        return ResponseEntityBuilder.getBuilder()
+                .setDetails(post)
+                .build();
+    }
+
 
 }

@@ -10,5 +10,6 @@ public interface PostService {
     PostResponse createPost(PostRequest postRequest);
     PostResponse getPostById(UUID id);
 
-    PaginationPage<PostResponse> getAllPostsByUserId(Integer offset, Integer limited, UUID userId);
+    PaginationPage<PostResponse> getAllPostsByUserId(Integer offset, Integer limited);
+    PostResponse updatePost(UUID postId, PostRequest postRequest);
 }
