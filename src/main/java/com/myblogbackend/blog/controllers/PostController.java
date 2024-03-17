@@ -34,7 +34,7 @@ public class PostController {
         return ResponseEntity.ok(post);
     }
 
-    @PostMapping("/posts")
+    @PostMapping()
     public ResponseEntity<?> createPost(@RequestBody @Valid final PostRequest postRequest) {
         var post = postService.createPost(postRequest);
         return ResponseEntityBuilder

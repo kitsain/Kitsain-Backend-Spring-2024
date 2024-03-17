@@ -19,6 +19,5 @@ public class PostRequest {
     @NotBlank(message = "Price info cannot be blank")
     private String price;
     private List<String> images;
-    @NotBlank(message = "Price info cannot be blank")
     private Date expringDate;
 }
