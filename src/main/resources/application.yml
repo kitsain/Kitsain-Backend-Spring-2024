@@ -62,3 +62,7 @@ app:
 
 flywaypf:
     active: blog_dbo
+
+google:
+    client:
+        id: 28179558203-kdugdkjaiuljem1ornmiobdua124kok7.apps.googleusercontent.com

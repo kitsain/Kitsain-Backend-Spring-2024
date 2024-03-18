@@ -85,3 +85,6 @@ flywaypf:
 # For development
 logging:
     config: classpath:log4j2-spring-dev.xml
+google:
+    client:
+        id: 28179558203-kdugdkjaiuljem1ornmiobdua124kok7.apps.googleusercontent.com

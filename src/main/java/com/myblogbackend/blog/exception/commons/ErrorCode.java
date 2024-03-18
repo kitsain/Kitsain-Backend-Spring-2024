@@ -20,6 +20,7 @@ public enum ErrorCode implements CommonErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "Account could not found"),
     JWT_CLAIM_EMPTY(HttpStatus.UNAUTHORIZED, "Claim empty"),
     ACCOUNT_NEEDS_TO_VERIFY(HttpStatus.BAD_REQUEST, "Account needs to verify"),
+    INVALID_ACCESS_TOKEN(HttpStatus.BAD_REQUEST, "Invalid access token"),
     EMAIL_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "error.could not send email");
     private final HttpStatus status;
     private final String message;
