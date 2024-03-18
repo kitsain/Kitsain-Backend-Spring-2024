@@ -69,7 +69,8 @@ public class AuthController {
     }
 
     @PostMapping("/verifyToken")
-    public ResponseEntity<?> verifyTokenFromGoogle(final @Valid @RequestBody AccessTokenRequest accessTokenRequest) throws GeneralSecurityException, IOException {
+    public ResponseEntity<?> verifyTokenFromGoogle(final @Valid @RequestBody AccessTokenRequest accessTokenRequest)
+            throws GeneralSecurityException, IOException {
         var jwtResponse = tokenService.verifyIdToken(accessTokenRequest.getAccessToken());
         return ResponseEntity.ok().body(jwtResponse);
     }

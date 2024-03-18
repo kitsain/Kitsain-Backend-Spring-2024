@@ -38,7 +38,7 @@ public class AccessTokenServiceImpl implements IdTokenService {
     private final JwtProvider jwtProvider;
     private final GoogleProperties googleProperties;
     @Override
-    public JwtResponse verifyIdToken(String token) throws GeneralSecurityException, IOException {
+    public JwtResponse verifyIdToken(final String token) throws GeneralSecurityException, IOException {
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(HTTP_TRANSPORT, JSON_FACTORY)
                 .setAudience(Collections.singletonList(googleProperties.getId()))
                 .build();
@@ -57,7 +57,7 @@ public class AccessTokenServiceImpl implements IdTokenService {
     }
 
 
-    private String generateJwtToken(UserEntity user) {
+    private String generateJwtToken(final UserEntity user) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtProvider.getExpiryDuration());
         return Jwts.builder()
@@ -70,7 +70,7 @@ public class AccessTokenServiceImpl implements IdTokenService {
                 .compact();
     }
 
-    private UserEntity createNewUser(String email, String name) {
+    private UserEntity createNewUser(final String email, final String name) {
         var user = new UserEntity();
         user.setProvider(OAuth2Provider.GOOGLE);
         user.setEmail(email);
