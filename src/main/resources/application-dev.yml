@@ -87,4 +87,4 @@ logging:
     config: classpath:log4j2-spring-dev.xml
 google:
     client:
-        id: 709026956129-nt0ged8nsm2hq70ha2n4sne6j2rcplsr.apps.googleusercontent.com
+        id:
