@@ -8,8 +8,14 @@ import java.util.UUID;
 
 public interface PostService {
     PostResponse createPost(PostRequest postRequest);
+
     PostResponse getPostById(UUID id);
 
     PaginationPage<PostResponse> getAllPostsByUserId(Integer offset, Integer limited);
+
     PostResponse updatePost(UUID postId, PostRequest postRequest);
+
+    PaginationPage<PostResponse> getAllPostOrderByCreated(Integer offset, Integer limited);
+
+
 }

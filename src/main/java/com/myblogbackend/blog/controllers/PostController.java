@@ -50,6 +50,15 @@ public class PostController {
                 .setDetails(post)
                 .build();
     }
+    @GetMapping("/feed")
+    public ResponseEntity<?> getAllPostOrderByCreated(@RequestParam(name = "offset", defaultValue = "0") final Integer offset,
+                                                      @RequestParam(name = "limit", defaultValue = "10") final Integer limit) {
+        var postFeeds = postService.getAllPostOrderByCreated(offset, limit);
+        return ResponseEntityBuilder
+                .getBuilder()
+                .setDetails(postFeeds)
+                .build();
+    }
 
 
 }

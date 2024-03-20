@@ -18,4 +18,5 @@ public class PostResponse {
     private List<String> images;
     private String price;
     private Date expringDate;
+    private UserResponse user;
 }

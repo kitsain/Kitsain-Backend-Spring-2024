@@ -78,7 +78,18 @@ public class PostServiceImpl implements PostService {
             throw new RuntimeException("Failed to updated post testing");
         }
     }
-
+    @Override
+    public PaginationPage<PostResponse> getAllPostOrderByCreated(Integer offset, Integer limited) {
+        try {
+            var pageable = new OffsetPageRequest(offset, limited);
+            var postEntities = postRepository.findAllOrderByCreatedDateDesc(pageable);
+            logger.info("Get feed list succeeded with offset: {} and limited {}", postEntities.getNumber(), postEntities.getSize());
+            return getPostResponsePaginationPage(postEntities);
+        } catch (Exception e) {
+            logger.error("Failed to get feed list", e);
+            throw new RuntimeException("Failed to get feed list");
+        }
+    }
     @Override
     public PostResponse getPostById(final UUID id) {
         try {

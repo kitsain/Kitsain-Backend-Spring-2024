@@ -4,9 +4,7 @@
         "https://checkstyle.org/dtds/configuration_1_3.dtd">
 <module name="Checker">
     <module name="TreeWalker">
-        <!-- Checks for imports -->
-        <module name="UnusedImports"/>
-<!--        <module name="AvoidStaticImport"/>-->
+        <!--<module name="AvoidStaticImport"/>-->
         <module name="PackageDeclaration"/>
         <module name="IllegalImport"/>
         <!-- Whitespace after brackets -->
@@ -14,6 +12,8 @@
         <!-- Checks for coding style -->
         <module name="FinalParameters"/>
         <module name="VisibilityModifier"/>
+        <!-- Checks for imports -->
+        <module name="UnusedImports"/>
     </module>
     <!-- Maximum line length check -->
     <module name="LineLength">
