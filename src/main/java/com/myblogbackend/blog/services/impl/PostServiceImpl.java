@@ -79,7 +79,7 @@ public class PostServiceImpl implements PostService {
         }
     }
     @Override
-    public PaginationPage<PostResponse> getAllPostOrderByCreated(Integer offset, Integer limited) {
+    public PaginationPage<PostResponse> getAllPostOrderByCreated(final Integer offset, final Integer limited) {
         try {
             var pageable = new OffsetPageRequest(offset, limited);
             var postEntities = postRepository.findAllOrderByCreatedDateDesc(pageable);
