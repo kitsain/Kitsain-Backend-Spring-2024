@@ -50,12 +50,10 @@ public class MinioServiceImpl implements MinioService {
     @SneakyThrows
     @Override
     public List<FileResponse> putObjects(final MultipartFile[] multipartFiles,
-                                         final String bucket, final String fileType) {
-        var bucketName = StringUtils.defaultIfBlank(bucket, minioConfig.getBucketName());
-        createBucketIfNotExists(bucketName);
+                                         final String fileType) {
         List<FileResponse> files = new ArrayList<>();
         for (MultipartFile file : multipartFiles) {
-            FileResponse fileResponse = processFile(file, bucketName, fileType);
+            FileResponse fileResponse = processFile(file, minioConfig.getBucketName(), fileType);
             files.add(fileResponse);
         }
 

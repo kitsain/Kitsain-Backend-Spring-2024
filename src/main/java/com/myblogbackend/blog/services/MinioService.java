@@ -12,6 +12,6 @@ public interface MinioService {
 
     FileResponse putObject(MultipartFile multipartFile, String bucketName, String fileType);
 
-    List<FileResponse> putObjects(MultipartFile[] multipartFile, String bucketName, String fileType);
+    List<FileResponse> putObjects(MultipartFile[] multipartFile, String fileType);
 
 }

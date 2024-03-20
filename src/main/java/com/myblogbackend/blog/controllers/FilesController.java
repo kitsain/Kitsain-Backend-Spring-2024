@@ -5,6 +5,7 @@ import com.myblogbackend.blog.controllers.route.CommonRoutes;
 import com.myblogbackend.blog.response.FileResponse;
 import com.myblogbackend.blog.services.MinioService;
 import com.myblogbackend.blog.utils.FileTypeUtils;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,6 +24,7 @@ public class FilesController {
 
     private final MinioService minioService;
 
+    @Hidden
     @PostMapping("/upload")
     public FileResponse uploadFile(final MultipartFile file, final String bucketName) {
         LOGGER.info("MinioController | uploadFile is called");
@@ -36,14 +38,14 @@ public class FilesController {
     }
 
     @PostMapping("/upload/files")
-    public List<FileResponse> uploadFiles(final MultipartFile[] files, final String bucketName) {
+    public List<FileResponse> uploadFiles(final MultipartFile[] files) {
         String fileType = "";
         for (MultipartFile file : files) {
             fileType = FileTypeUtils.getFileType(file);
         }
         LOGGER.info("MinioController | uploadFile | fileType : " + fileType);
         if (fileType != null) {
-            return minioService.putObjects(files, bucketName, fileType);
+            return minioService.putObjects(files, fileType);
         }
         throw new FileResponseException("File cannot be Upload");
     }
