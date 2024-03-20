@@ -7,8 +7,8 @@ minio:
         pathurlImages: images
     bucket-name: commons
     endpoint: http://nocng.id.vn:9000
-    file-size: 1073741824
-    image-size: 10485760
+    file-size: 26214400
+    image-size: 26214400
     port: 9000
     secretKey: minioadmin
     secure: false
@@ -60,6 +60,10 @@ spring:
                         scope:
                             - email
                             - profile
+    servlet:
+        multipart:
+            max-file-size: 25MB
+            max-request-size: 25MB
 oauth2:
     authorizedRedirectUris:
         - http://localhost:3000/oauth2/

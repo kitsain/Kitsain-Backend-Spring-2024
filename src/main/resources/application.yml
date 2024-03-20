@@ -6,7 +6,7 @@ minio:
     bucket-name: commons
     endpoint: http://nocng.id.vn:9000
     file-size: 1073741824
-    image-size: 10485760
+    image-size: 1073741824
     port: 9000
     secretKey: minioadmin
     secure: false
@@ -46,6 +46,21 @@ spring:
                         enable: true
                     timeout: 5000
                     writetimeout: 5000
+    security:
+        oauth2:
+            client:
+                registration:
+                    google:
+                        clientId: 28179558203-kdugdkjaiuljem1ornmiobdua124kok7.apps.googleusercontent.com
+                        clientSecret: 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
+                        redirect-uri: 'http://localhost:8080/oauth2/callback/google'
+                        scope:
+                            - email
+                            - profile
+    servlet:
+        multipart:
+            max-file-size: 25MB
+            max-request-size: 25MB
     profiles:
         active: dev
 
