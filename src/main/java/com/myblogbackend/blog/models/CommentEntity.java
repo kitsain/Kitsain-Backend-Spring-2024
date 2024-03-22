@@ -1,5 +1,6 @@
 package com.myblogbackend.blog.models;
 
+import com.myblogbackend.blog.models.base.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -24,25 +25,29 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CommentEntity {
+public class CommentEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(columnDefinition = "uuid", updatable = false, nullable = false)
     private UUID id;
-    
+
     private String content;
 
     @Column(name = "status")
-    private String status = "active";
-    
+    private Boolean status;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name ="user_id" )
+    @JoinColumn(name = "user_id")
     private UserEntity user;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private PostEntity post;
-    
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_comment_id")
+    private CommentEntity parentComment;
+
 }

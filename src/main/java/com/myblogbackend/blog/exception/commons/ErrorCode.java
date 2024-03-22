@@ -21,6 +21,9 @@ public enum ErrorCode implements CommonErrorCode {
     JWT_CLAIM_EMPTY(HttpStatus.UNAUTHORIZED, "Claim empty"),
     ACCOUNT_NEEDS_TO_VERIFY(HttpStatus.BAD_REQUEST, "Account needs to verify"),
     INVALID_ACCESS_TOKEN(HttpStatus.BAD_REQUEST, "Invalid access token"),
+    PARENT_COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "Could not found comment parent"),
+    UNABLE_EDIT_COMMENT(HttpStatus.UNAUTHORIZED, "Unable to edit comment"),
+    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "Could not found comment"),
     EMAIL_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "error.could not send email");
     private final HttpStatus status;
     private final String message;

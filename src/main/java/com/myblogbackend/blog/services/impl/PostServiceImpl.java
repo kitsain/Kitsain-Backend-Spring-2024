@@ -18,6 +18,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -30,6 +31,7 @@ public class PostServiceImpl implements PostService {
     private final UsersRepository usersRepository;
     private final PostMapper postMapper;
 
+    @Transactional
     @Override
     public PostResponse createPost(final PostRequest postRequest) {
         try {
@@ -58,7 +60,7 @@ public class PostServiceImpl implements PostService {
             throw new RuntimeException("Failed to get list post");
         }
     }
-
+    @Transactional
     @Override
     public PostResponse updatePost(final UUID postId, final PostRequest postRequest) {
         try {

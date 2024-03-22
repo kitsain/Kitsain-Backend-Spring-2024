@@ -14,10 +14,8 @@ public interface CommentMapper {
     CommentEntity toCommentEntity(CommentRequest commentRequest);
 
     @Mapping(source = "commentEntity.user.name", target = "userName")
-    @Mapping(source = "commentEntity.post.id", target = "postId")
     CommentResponse toCommentResponse(CommentEntity commentEntity);
 
     @Mapping(source = "commentEntity.user.name", target = "userName")
-    @Mapping(source = "commentEntity.post.id", target = "postId")
     List<CommentResponse> toListCommentResponse(List<CommentEntity> commentEntityList);
 }
