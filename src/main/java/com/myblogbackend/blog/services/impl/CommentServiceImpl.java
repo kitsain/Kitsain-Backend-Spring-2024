@@ -16,11 +16,12 @@ import com.myblogbackend.blog.utils.JWTSecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,32 +31,25 @@ public class CommentServiceImpl implements CommentService {
     private final UsersRepository usersRepository;
     private final CommentRepository commentRepository;
     private static final Logger logger = LogManager.getLogger(PostServiceImpl.class);
-
     @Override
-    public PaginationPage<CommentResponse> getListCommentsByPostId(final Integer offset, final Integer limited, final UUID postId) {
+    public PaginationPage<CommentResponse> getListCommentsByPostId(final Integer offset,
+                                                                   final Integer limited,
+                                                                   final UUID postId) {
         try {
-            //create the pageable by OffsetPageRequest class
+            var post = postRepository.findById(postId)
+                    .orElseThrow(() -> new BlogRuntimeException(ErrorCode.ID_NOT_FOUND));
             var pageable = new OffsetPageRequest(offset, limited);
-            //find list of comments by post id and pageable
-            var commentEntityList = commentRepository.findAllByPostId(postId, pageable);
-            //stream and map to return list of comment response
-            var commentResponseList = commentEntityList
-                    .getContent()
-                    .stream()
-                    .map(item ->
-                            commentMapper.toCommentResponse(item))
-                    .collect(Collectors.toList());
-            //add logger
-            logger.info("Get list of comment by post id successfully {}", postId);
-            //create the PaginationPage instance, set records, offset, limit and total
+            Page<CommentEntity> comments = commentRepository.findByPostId(post.getId(), pageable);
+            logger.info("Retrieved comments for post ID {}", postId);
+            List<CommentResponse> commentResponses = commentMapper.toListCommentResponse(comments.getContent());
             return new PaginationPage<CommentResponse>()
-                    .setRecords(commentResponseList)
-                    .setOffset(commentEntityList.getNumber())
-                    .setLimit(commentEntityList.getSize())
-                    .setTotalRecords(commentEntityList.getTotalElements());
+                    .setRecords(commentResponses)
+                    .setOffset(comments.getNumber())
+                    .setLimit(comments.getSize())
+                    .setTotalRecords(comments.getTotalElements());
         } catch (Exception e) {
-            logger.info("Failed to get list of comments by post id", e);
-            throw new RuntimeException("Failed to get comment list by post id");
+            logger.error("Failed to retrieve comments for post ID {}", postId, e);
+            throw new RuntimeException("Failed to retrieve comments for post ID " + postId);
         }
     }
 

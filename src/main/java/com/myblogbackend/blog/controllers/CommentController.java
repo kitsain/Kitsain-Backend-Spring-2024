@@ -32,7 +32,10 @@ public class CommentController {
             @RequestParam(name = "offset", defaultValue = "0") final Integer offset,
             @PathVariable(value = "postId") final UUID postId) {
         var commentResponseList = commentService.getListCommentsByPostId(offset, limit, postId);
-        return ResponseEntity.ok(commentResponseList);
+        return ResponseEntityBuilder
+                .getBuilder()
+                .setDetails(commentResponseList)
+                .build();
     }
 
     @PostMapping
