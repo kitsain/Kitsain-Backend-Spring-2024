@@ -112,13 +112,12 @@ public class PostServiceImpl implements PostService {
             postRepository.save(post);
             // Disable all comments following this post
             List<CommentEntity> comments = commentRepository.findByPostId(postId);
-            for (CommentEntity comment : comments) {
-                // Check if the comment's post ID matches the ID of the post being disabled
-                if (comment.getPost().getId().equals(postId)) {
-                    comment.setStatus(false);
-                    commentRepository.save(comment);
-                }
-            }
+            comments.stream()
+                    .filter(comment -> comment.getPost().getId().equals(postId))
+                    .forEach(comment -> {
+                        comment.setStatus(false);
+                        commentRepository.save(comment);
+                    });
             logger.info("Disabled post and associated comments successfully");
         } catch (Exception e) {
             logger.error("Failed to disable post by id {}", postId, e);
