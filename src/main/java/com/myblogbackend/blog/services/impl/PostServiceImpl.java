@@ -42,6 +42,7 @@ public class PostServiceImpl implements PostService {
             var signedInUser = JWTSecurityUtil.getJWTUserInfo().orElseThrow();
             var postEntity = postMapper.toPostEntity(postRequest);
             postEntity.setUser(usersRepository.findById(signedInUser.getId()).orElseThrow());
+            postEntity.setStatus(true);
             var createdPost = postRepository.save(postEntity);
             logger.info("Post was created with id: {}", createdPost.getId());
             return postMapper.toPostResponse(createdPost);
