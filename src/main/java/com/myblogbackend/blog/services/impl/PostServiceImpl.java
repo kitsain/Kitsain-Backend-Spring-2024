@@ -3,9 +3,11 @@ package com.myblogbackend.blog.services.impl;
 import com.myblogbackend.blog.exception.commons.BlogRuntimeException;
 import com.myblogbackend.blog.exception.commons.ErrorCode;
 import com.myblogbackend.blog.mapper.PostMapper;
+import com.myblogbackend.blog.models.CommentEntity;
 import com.myblogbackend.blog.models.PostEntity;
 import com.myblogbackend.blog.pagination.OffsetPageRequest;
 import com.myblogbackend.blog.pagination.PaginationPage;
+import com.myblogbackend.blog.repositories.CommentRepository;
 import com.myblogbackend.blog.repositories.PostRepository;
 import com.myblogbackend.blog.repositories.UsersRepository;
 import com.myblogbackend.blog.request.PostRequest;
@@ -20,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -30,6 +33,7 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final UsersRepository usersRepository;
     private final PostMapper postMapper;
+    private final CommentRepository commentRepository;
 
     @Transactional
     @Override
@@ -95,6 +99,7 @@ public class PostServiceImpl implements PostService {
         }
     }
 
+    @Transactional
     @Override
     public void disablePost(final UUID postId) {
         try {
@@ -102,12 +107,22 @@ public class PostServiceImpl implements PostService {
                     .findById(postId)
                     .orElseThrow(() -> new BlogRuntimeException(ErrorCode.ID_NOT_FOUND));
 
-            logger.info("Disable post successfully by id {} ", postId);
+            logger.info("Disabling post successfully by id {}", postId);
             post.setStatus(false);
             postRepository.save(post);
+            // Disable all comments following this post
+            List<CommentEntity> comments = commentRepository.findByPostId(postId);
+            for (CommentEntity comment : comments) {
+                // Check if the comment's post ID matches the ID of the post being disabled
+                if (comment.getPost().getId().equals(postId)) {
+                    comment.setStatus(false);
+                    commentRepository.save(comment);
+                }
+            }
+            logger.info("Disabled post and associated comments successfully");
         } catch (Exception e) {
-            logger.error("Failed Disable post by id {}", postId);
-            throw new RuntimeException("Failed to get post by id {} ", e);
+            logger.error("Failed to disable post by id {}", postId, e);
+            throw new RuntimeException("Failed to disable post by id " + postId);
         }
     }
 
