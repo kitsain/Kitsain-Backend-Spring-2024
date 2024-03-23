@@ -18,5 +18,6 @@ public class PostResponse {
     private List<String> images;
     private String price;
     private Date expringDate;
+    private Long favourite = 0L;
     private UserResponse user;
 }
