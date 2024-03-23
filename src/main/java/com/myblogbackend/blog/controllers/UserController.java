@@ -8,6 +8,7 @@ import com.myblogbackend.blog.response.UserResponse;
 import com.myblogbackend.blog.config.security.CurrentUser;
 import com.myblogbackend.blog.config.security.UserPrincipal;
 import com.myblogbackend.blog.services.UserService;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +35,7 @@ public class UserController {
         return ResponseEntity.ok(userProfile);
     }
 
+    @Hidden
     @PutMapping("/logout")
     public ResponseEntity<ApiResponse> logoutUser(final @CurrentUser UserPrincipal currentUser,
                                                   final @Valid @RequestBody LogOutRequest logOutRequest) {
