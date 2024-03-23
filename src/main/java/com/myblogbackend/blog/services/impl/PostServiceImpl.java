@@ -96,7 +96,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public void disablePost(UUID postId) {
+    public void disablePost(final UUID postId) {
         try {
             var post = postRepository
                     .findById(postId)
