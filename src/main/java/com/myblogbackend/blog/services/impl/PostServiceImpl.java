@@ -52,7 +52,7 @@ public class PostServiceImpl implements PostService {
         try {
             var signedInUser = JWTSecurityUtil.getJWTUserInfo().orElseThrow();
             var pageable = new OffsetPageRequest(offset, limited);
-            var postEntities = postRepository.findAllByUserId(signedInUser.getId(), pageable);
+            var postEntities = postRepository.findAllByUserIdAndStatusTrue(signedInUser.getId(), pageable);
             logger.info("Post get succeeded with offset: {} and limited {}", postEntities.getNumber(), postEntities.getSize());
             return getPostResponsePaginationPage(postEntities);
         } catch (Exception e) {
@@ -60,6 +60,7 @@ public class PostServiceImpl implements PostService {
             throw new RuntimeException("Failed to get list post");
         }
     }
+
     @Transactional
     @Override
     public PostResponse updatePost(final UUID postId, final PostRequest postRequest) {
@@ -80,11 +81,12 @@ public class PostServiceImpl implements PostService {
             throw new RuntimeException("Failed to updated post testing");
         }
     }
+
     @Override
     public PaginationPage<PostResponse> getAllPostOrderByCreated(final Integer offset, final Integer limited) {
         try {
             var pageable = new OffsetPageRequest(offset, limited);
-            var postEntities = postRepository.findAllOrderByCreatedDateDesc(pageable);
+            var postEntities = postRepository.findAllByStatusTrueOrderByCreatedDateDesc(pageable);
             logger.info("Get feed list succeeded with offset: {} and limited {}", postEntities.getNumber(), postEntities.getSize());
             return getPostResponsePaginationPage(postEntities);
         } catch (Exception e) {
@@ -92,6 +94,23 @@ public class PostServiceImpl implements PostService {
             throw new RuntimeException("Failed to get feed list");
         }
     }
+
+    @Override
+    public void disablePost(UUID postId) {
+        try {
+            var post = postRepository
+                    .findById(postId)
+                    .orElseThrow(() -> new BlogRuntimeException(ErrorCode.ID_NOT_FOUND));
+
+            logger.info("Disable post successfully by id {} ", postId);
+            post.setStatus(false);
+            postRepository.save(post);
+        } catch (Exception e) {
+            logger.error("Failed Disable post by id {}", postId);
+            throw new RuntimeException("Failed to get post by id {} ", e);
+        }
+    }
+
     @Override
     public PostResponse getPostById(final UUID id) {
         try {

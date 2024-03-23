@@ -50,6 +50,7 @@ public class PostController {
                 .setDetails(post)
                 .build();
     }
+
     @GetMapping("/feed")
     public ResponseEntity<?> getAllPostOrderByCreated(@RequestParam(name = "offset", defaultValue = "0") final Integer offset,
                                                       @RequestParam(name = "limit", defaultValue = "10") final Integer limit) {
@@ -57,6 +58,12 @@ public class PostController {
         return ResponseEntityBuilder
                 .getBuilder()
                 .setDetails(postFeeds)
+                .build();
+    }
+    @PutMapping("/disable/{postId}")
+    public ResponseEntity<?> disablePost(@PathVariable final UUID postId) {
+        postService.disablePost(postId);
+        return ResponseEntityBuilder.getBuilder()
                 .build();
     }
 

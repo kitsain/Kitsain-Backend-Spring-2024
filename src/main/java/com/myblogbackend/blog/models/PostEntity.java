@@ -38,6 +38,9 @@ public class PostEntity extends BaseEntity {
     @Column(name = "price")
     private String price;
 
+    @Column(name = "status")
+    private Boolean status;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private UserEntity user;

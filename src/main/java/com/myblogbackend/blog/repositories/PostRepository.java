@@ -9,9 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.UUID;
 
 public interface PostRepository extends JpaRepository<PostEntity, UUID> {
-    Page<PostEntity> findAllByUserId(UUID userId, Pageable pageable);
-
-    @Query("SELECT p FROM PostEntity p ORDER BY p.createdDate DESC")
-    Page<PostEntity> findAllOrderByCreatedDateDesc(Pageable pageable);
+    Page<PostEntity> findAllByUserIdAndStatusTrue(UUID userId, Pageable pageable);
+    Page<PostEntity> findAllByStatusTrueOrderByCreatedDateDesc(Pageable pageable);
 
 }

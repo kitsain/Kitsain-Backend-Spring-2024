@@ -17,5 +17,7 @@ public interface PostService {
 
     PaginationPage<PostResponse> getAllPostOrderByCreated(Integer offset, Integer limited);
 
+    void disablePost(UUID postId);
+
 
 }
