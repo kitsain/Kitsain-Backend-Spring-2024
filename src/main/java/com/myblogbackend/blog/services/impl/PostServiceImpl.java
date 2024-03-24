@@ -43,6 +43,7 @@ public class PostServiceImpl implements PostService {
             var postEntity = postMapper.toPostEntity(postRequest);
             postEntity.setUser(usersRepository.findById(signedInUser.getId()).orElseThrow());
             postEntity.setStatus(true);
+            postEntity.setFavourite(0L);
             var createdPost = postRepository.save(postEntity);
             logger.info("Post was created with id: {}", createdPost.getId());
             return postMapper.toPostResponse(createdPost);
