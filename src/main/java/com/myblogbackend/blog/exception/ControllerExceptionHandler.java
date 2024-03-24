@@ -71,7 +71,7 @@ public class ControllerExceptionHandler {
     }
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseBody
-    public ResponseEntity<?> handleConstraintViolationException(ConstraintViolationException e) {
+    public ResponseEntity<?> handleConstraintViolationException(final ConstraintViolationException e) {
         return ResponseEntityBuilder.getBuilder()
                 .setCode(HttpStatus.BAD_REQUEST)
                 .setMessage(e.getMessage())
