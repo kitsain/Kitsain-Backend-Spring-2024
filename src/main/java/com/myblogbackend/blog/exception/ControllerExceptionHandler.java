@@ -3,6 +3,7 @@ package com.myblogbackend.blog.exception;
 import com.myblogbackend.blog.exception.commons.BlogRuntimeException;
 import com.myblogbackend.blog.response.ResponseEntityBuilder;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
@@ -65,6 +66,14 @@ public class ControllerExceptionHandler {
         return ResponseEntityBuilder
                 .getBuilder()
                 .setCode(Integer.parseInt(String.valueOf(e.getStatus().value())))
+                .setMessage(e.getMessage())
+                .build();
+    }
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseBody
+    public ResponseEntity<?> handleConstraintViolationException(ConstraintViolationException e) {
+        return ResponseEntityBuilder.getBuilder()
+                .setCode(HttpStatus.BAD_REQUEST)
                 .setMessage(e.getMessage())
                 .build();
     }
