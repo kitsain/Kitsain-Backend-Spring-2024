@@ -30,19 +30,20 @@ public class FavoriteServiceImpl implements FavoriteService {
             var post = postRepository.findById(postId)
                     .orElseThrow(() -> new BlogRuntimeException(ErrorCode.ID_NOT_FOUND));
 
-            if (existingFavorite.isEmpty()) {
-                // User did not favorite this post, so increment the favorite count and save the favorite
-                post.setFavourite(post.getFavourite() + 1);
-                favoriteRepository.save(FavoriteEntity.builder().user(UserEntity.builder().id(signedInUser.getId()).build())
-                        .post(post).build());
-                logger.info("User {} favorited post {} successfully", signedInUser.getId(), postId);
-            } else {
-                // User already favorited this post, so decrement the favorite count and delete the favorite
+            existingFavorite.ifPresentOrElse(favorite -> {
                 post.setFavourite(Math.max(0, post.getFavourite() - 1));
-                favoriteRepository.delete(existingFavorite.get());
+                favoriteRepository.delete(favorite);
                 logger.info("User {} unfavorited post {} successfully", signedInUser.getId(), postId);
-            }
-            // Save the updated post with the new favorite count
+            }, () -> {
+                post.setFavourite(post.getFavourite() + 1);
+                favoriteRepository.save(
+                        FavoriteEntity.builder()
+                                .user(UserEntity.builder().id(signedInUser.getId()).build())
+                                .post(post)
+                                .build()
+                );
+                logger.info("User {} favorited post {} successfully", signedInUser.getId(), postId);
+            });
             postRepository.save(post);
         } catch (Exception e) {
             logger.error("Failed to persist or delete favorite for post {}", postId, e);
