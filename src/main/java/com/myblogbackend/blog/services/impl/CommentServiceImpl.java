@@ -52,51 +52,41 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     @Override
     public CommentResponse createNewComment(final CommentRequest commentRequest) {
-        try {
-            var signedInUser = JWTSecurityUtil.getJWTUserInfo().orElseThrow();
-            var post = postRepository.findById(commentRequest.getPostId())
-                    .orElseThrow(() -> new BlogRuntimeException(ErrorCode.ID_NOT_FOUND));
-            // If the comment has a parent comment, retrieve it from the database
-            CommentEntity parentComment = null;
-            if (commentRequest.getParentCommentId() != null) {
-                parentComment = commentRepository.findById(commentRequest.getParentCommentId())
-                        .orElseThrow(() -> new BlogRuntimeException(ErrorCode.PARENT_COMMENT_NOT_FOUND));
-            }
-            var commentEntity = commentMapper.toCommentEntity(commentRequest);
-            var userFound = usersRepository.findById(signedInUser.getId()).orElseThrow();
-            commentEntity.setUser(userFound);
-            commentEntity.setPost(post);
-            commentEntity.setParentComment(parentComment);
-            commentEntity.setStatus(true);
-            commentEntity.setCreatedBy(signedInUser.getName());
-            var createdComment = commentRepository.save(commentEntity);
-            logger.info("Created the comment for post ID {} by user ID {}",
-                    commentRequest.getPostId(), signedInUser.getId());
-            return commentMapper.toCommentResponse(createdComment);
-        } catch (Exception e) {
-            logger.error("Failed to create the comment", e);
-            throw new RuntimeException("Failed to create the comment");
+        var signedInUser = JWTSecurityUtil.getJWTUserInfo().orElseThrow();
+        var post = postRepository.findById(commentRequest.getPostId())
+                .orElseThrow(() -> new BlogRuntimeException(ErrorCode.ID_NOT_FOUND));
+        // If the comment has a parent comment, retrieve it from the database
+        CommentEntity parentComment = null;
+        if (commentRequest.getParentCommentId() != null) {
+            parentComment = commentRepository.findById(commentRequest.getParentCommentId())
+                    .orElseThrow(() -> new BlogRuntimeException(ErrorCode.PARENT_COMMENT_NOT_FOUND));
         }
+        var commentEntity = commentMapper.toCommentEntity(commentRequest);
+        var userFound = usersRepository.findById(signedInUser.getId()).orElseThrow();
+        commentEntity.setUser(userFound);
+        commentEntity.setPost(post);
+        commentEntity.setParentComment(parentComment);
+        commentEntity.setStatus(true);
+        commentEntity.setCreatedBy(signedInUser.getName());
+        var createdComment = commentRepository.save(commentEntity);
+        logger.info("Created the comment for post ID {} by user ID {}",
+                commentRequest.getPostId(), signedInUser.getId());
+        return commentMapper.toCommentResponse(createdComment);
     }
 
     @Transactional
     @Override
     public CommentResponse updateComment(final UUID commentId, final CommentRequest commentRequest) {
-        try {
-            var signedInUser = JWTSecurityUtil.getJWTUserInfo().orElseThrow();
-            var existingComment = commentRepository.findById(commentId)
-                    .orElseThrow(() -> new BlogRuntimeException(ErrorCode.COMMENT_NOT_FOUND));
-            if (!existingComment.getUser().getId().equals(signedInUser.getId())) {
-                throw new BlogRuntimeException(ErrorCode.UNABLE_EDIT_COMMENT);
-            }
-            existingComment.setContent(commentRequest.getContent());
-            var updatedComment = commentRepository.save(existingComment);
-            logger.info("Updated the comment with ID {} by user ID {}",
-                    commentId, signedInUser.getId());
-            return commentMapper.toCommentResponse(updatedComment);
-        } catch (Exception e) {
-            logger.error("Failed to update the comment", e);
-            throw new RuntimeException("Failed to update the comment");
+        var signedInUser = JWTSecurityUtil.getJWTUserInfo().orElseThrow();
+        var existingComment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new BlogRuntimeException(ErrorCode.COMMENT_NOT_FOUND));
+        if (!existingComment.getUser().getId().equals(signedInUser.getId())) {
+            throw new BlogRuntimeException(ErrorCode.UNABLE_EDIT_COMMENT);
         }
+        existingComment.setContent(commentRequest.getContent());
+        var updatedComment = commentRepository.save(existingComment);
+        logger.info("Updated the comment with ID {} by user ID {}",
+                commentId, signedInUser.getId());
+        return commentMapper.toCommentResponse(updatedComment);
     }
 }

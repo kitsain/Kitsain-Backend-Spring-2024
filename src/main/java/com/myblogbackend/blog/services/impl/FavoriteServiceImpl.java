@@ -24,30 +24,25 @@ public class FavoriteServiceImpl implements FavoriteService {
 
     @Override
     public void persistOrDelete(final UUID postId) {
-        try {
-            var signedInUser = JWTSecurityUtil.getJWTUserInfo().orElseThrow();
-            var existingFavorite = favoriteRepository.findByUserIdAndPostId(signedInUser.getId(), postId);
-            var post = postRepository.findById(postId)
-                    .orElseThrow(() -> new BlogRuntimeException(ErrorCode.ID_NOT_FOUND));
+        var signedInUser = JWTSecurityUtil.getJWTUserInfo().orElseThrow();
+        var existingFavorite = favoriteRepository.findByUserIdAndPostId(signedInUser.getId(), postId);
+        var post = postRepository.findById(postId)
+                .orElseThrow(() -> new BlogRuntimeException(ErrorCode.ID_NOT_FOUND));
 
-            existingFavorite.ifPresentOrElse(favorite -> {
-                post.setFavourite(Math.max(0, post.getFavourite() - 1));
-                favoriteRepository.delete(favorite);
-                logger.info("User {} unfavorited post {} successfully", signedInUser.getId(), postId);
-            }, () -> {
-                post.setFavourite(post.getFavourite() + 1);
-                favoriteRepository.save(
-                        FavoriteEntity.builder()
-                                .user(UserEntity.builder().id(signedInUser.getId()).build())
-                                .post(post)
-                                .build()
-                );
-                logger.info("User {} favorited post {} successfully", signedInUser.getId(), postId);
-            });
-            postRepository.save(post);
-        } catch (Exception e) {
-            logger.error("Failed to persist or delete favorite for post {}", postId, e);
-            throw new RuntimeException("Failed to persist or delete favorite for post " + postId, e);
-        }
+        existingFavorite.ifPresentOrElse(favorite -> {
+            post.setFavourite(Math.max(0, post.getFavourite() - 1));
+            favoriteRepository.delete(favorite);
+            logger.info("User {} unfavorited post {} successfully", signedInUser.getId(), postId);
+        }, () -> {
+            post.setFavourite(post.getFavourite() + 1);
+            favoriteRepository.save(
+                    FavoriteEntity.builder()
+                            .user(UserEntity.builder().id(signedInUser.getId()).build())
+                            .post(post)
+                            .build()
+            );
+            logger.info("User {} favorited post {} successfully", signedInUser.getId(), postId);
+        });
+        postRepository.save(post);
     }
 }
