@@ -31,26 +31,22 @@ public class CommentServiceImpl implements CommentService {
     private final UsersRepository usersRepository;
     private final CommentRepository commentRepository;
     private static final Logger logger = LogManager.getLogger(PostServiceImpl.class);
+
     @Override
     public PaginationPage<CommentResponse> getListCommentsByPostId(final Integer offset,
                                                                    final Integer limited,
                                                                    final UUID postId) {
-        try {
-            var post = postRepository.findById(postId)
-                    .orElseThrow(() -> new BlogRuntimeException(ErrorCode.ID_NOT_FOUND));
-            var pageable = new OffsetPageRequest(offset, limited);
-            Page<CommentEntity> comments = commentRepository.findByPostId(post.getId(), pageable);
-            logger.info("Retrieved comments for post ID {}", postId);
-            List<CommentResponse> commentResponses = commentMapper.toListCommentResponse(comments.getContent());
-            return new PaginationPage<CommentResponse>()
-                    .setRecords(commentResponses)
-                    .setOffset(comments.getNumber())
-                    .setLimit(comments.getSize())
-                    .setTotalRecords(comments.getTotalElements());
-        } catch (Exception e) {
-            logger.error("Failed to retrieve comments for post ID {}", postId, e);
-            throw new RuntimeException("Failed to retrieve comments for post ID " + postId);
-        }
+        var post = postRepository.findById(postId)
+                .orElseThrow(() -> new BlogRuntimeException(ErrorCode.ID_NOT_FOUND));
+        var pageable = new OffsetPageRequest(offset, limited);
+        Page<CommentEntity> comments = commentRepository.findByPostIdAndPostStatusTrueOrderByCreatedDateDesc(post.getId(), pageable);
+        logger.info("Retrieved comments for post ID {}", postId);
+        List<CommentResponse> commentResponses = commentMapper.toListCommentResponse(comments.getContent());
+        return new PaginationPage<CommentResponse>()
+                .setRecords(commentResponses)
+                .setOffset(comments.getNumber())
+                .setLimit(comments.getSize())
+                .setTotalRecords(comments.getTotalElements());
     }
 
     @Transactional
