@@ -114,20 +114,20 @@ public class PostServiceImpl implements PostService {
 
         var postResponses = postEntities.getContent().stream()
                 .map(postEntity -> {
-                    PostResponse postResponse = postMapper.toPostResponse(postEntity);
+                    var postResponse = postMapper.toPostResponse(postEntity);
 
                     // Fetch all favorites for this post
-                    List<FavoriteEntity> favoriteEntities = favoriteRepository.findAllByPostId(postEntity.getId());
+                    var favoriteEntities = favoriteRepository.findAllByPostId(postEntity.getId());
 
                     // Fetch users who liked the post
                     var userLikedPosts = favoriteEntities.stream()
                             .map(FavoriteEntity::getUser)
                             .map(userMapper::toUserResponse)
-                            .collect(Collectors.toList());
+                            .toList();
 
                     postResponse.setUsersLikedPost(userLikedPosts);
                     // Set favorite type for the signed-in user
-                    Optional<FavoriteEntity> favoriteEntityOpt = favoriteRepository.findByUserIdAndPostId(signedInUser.getId(), postEntity.getId());
+                    var favoriteEntityOpt = favoriteRepository.findByUserIdAndPostId(signedInUser.getId(), postEntity.getId());
                     var ratingType = favoriteEntityOpt
                             .map(FavoriteEntity::getType)
                             .map(type -> RatingType.valueOf(type.name()))
@@ -157,7 +157,7 @@ public class PostServiceImpl implements PostService {
         post.setStatus(false);
         postRepository.save(post);
         // Disable all comments following this post
-        List<CommentEntity> comments = commentRepository.findByPostId(postId);
+        var comments = commentRepository.findByPostId(postId);
         comments.stream()
                 .filter(comment -> comment.getPost().getId().equals(postId))
                 .forEach(comment -> {

@@ -31,7 +31,10 @@ public class PostController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getPostById(@PathVariable(value = "id") final UUID id) {
         var post = postService.getPostById(id);
-        return ResponseEntity.ok(post);
+        return ResponseEntityBuilder
+                .getBuilder()
+                .setDetails(post)
+                .build();
     }
 
     @PostMapping()
