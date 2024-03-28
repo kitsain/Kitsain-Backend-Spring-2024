@@ -1,5 +1,6 @@
 package com.myblogbackend.blog.services.impl;
 
+import com.myblogbackend.blog.config.security.UserPrincipal;
 import com.myblogbackend.blog.enums.RatingType;
 import com.myblogbackend.blog.exception.commons.BlogRuntimeException;
 import com.myblogbackend.blog.exception.commons.ErrorCode;
@@ -21,6 +22,7 @@ import com.myblogbackend.blog.utils.JWTSecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +44,7 @@ public class PostServiceImpl implements PostService {
     @Transactional
     @Override
     public PostResponse createPost(final PostRequest postRequest) {
-        var signedInUser = JWTSecurityUtil.getJWTUserInfo().orElseThrow();
+        var signedInUser = getSignedInUser();
         var postEntity = postMapper.toPostEntity(postRequest);
         postEntity.setUser(usersRepository.findById(signedInUser.getId()).orElseThrow());
         postEntity.setStatus(true);
@@ -56,7 +58,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PaginationPage<PostResponse> getAllPostsByUserId(final Integer offset, final Integer limited) {
-        var signedInUser = JWTSecurityUtil.getJWTUserInfo().orElseThrow();
+        var signedInUser = getSignedInUser();
         var pageable = new OffsetPageRequest(offset, limited);
         var postEntities = postRepository.findAllByUserIdAndStatusTrueOrderByCreatedDateDesc(signedInUser.getId(), pageable);
 
@@ -77,26 +79,37 @@ public class PostServiceImpl implements PostService {
                 .setTotalRecords(postEntities.getTotalElements());
     }
 
+
     @Transactional
     @Override
     public PostResponse updatePost(final UUID postId, final PostRequest postRequest) {
+        var signedInUser = getUserPrincipal();
+        // Fetch the post by ID and owner user ID
         var post = postRepository
-                .findById(postId)
+                .findByIdAndUserId(postId, signedInUser.getId())
                 .orElseThrow(() -> new BlogRuntimeException(ErrorCode.ID_NOT_FOUND));
+        // Update the post details
         post.setTitle(postRequest.getTitle());
         post.setDescription(postRequest.getDescription());
         post.setPrice(postRequest.getPrice());
         post.setImages(GsonUtils.arrayToString(postRequest.getImages()));
         post.setExpringDate(postRequest.getExpringDate());
+        // Save the updated post
         var updatedPost = postRepository.save(post);
         logger.info("Updated post with id: {}", updatedPost.getId());
         return postMapper.toPostResponse(updatedPost);
 
     }
 
+    @NotNull
+    private static UserPrincipal getUserPrincipal() {
+        var signedInUser = getSignedInUser();
+        return signedInUser;
+    }
+
     @Override
     public PaginationPage<PostResponse> getAllPostOrderByCreated(final Integer offset, final Integer limited) {
-        var signedInUser = JWTSecurityUtil.getJWTUserInfo().orElseThrow();
+        var signedInUser = getSignedInUser();
         var pageable = new OffsetPageRequest(offset, limited);
         var postEntities = postRepository.findAllByStatusTrueOrderByCreatedDateDesc(pageable);
 
@@ -133,8 +146,10 @@ public class PostServiceImpl implements PostService {
     @Transactional
     @Override
     public void disablePost(final UUID postId) {
+        var signedInUser = getUserPrincipal();
+        // Fetch the post by ID and owner user ID
         var post = postRepository
-                .findById(postId)
+                .findByIdAndUserId(postId, signedInUser.getId())
                 .orElseThrow(() -> new BlogRuntimeException(ErrorCode.ID_NOT_FOUND));
 
         logger.info("Disabling post successfully by id {}", postId);
@@ -159,6 +174,10 @@ public class PostServiceImpl implements PostService {
         logger.error("Get post successfully by id {} ", id);
         return postMapper.toPostResponse(post);
 
+    }
+    @NotNull
+    private static UserPrincipal getSignedInUser() {
+        return JWTSecurityUtil.getJWTUserInfo().orElseThrow();
     }
     private List<UserLikedPostResponse> fetchUsersWhoLikedPost(final UUID postId) {
         var favoriteEntities = favoriteRepository.findAllByPostId(postId);
