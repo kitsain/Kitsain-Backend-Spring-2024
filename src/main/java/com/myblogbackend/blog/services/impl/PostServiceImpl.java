@@ -5,7 +5,6 @@ import com.myblogbackend.blog.exception.commons.BlogRuntimeException;
 import com.myblogbackend.blog.exception.commons.ErrorCode;
 import com.myblogbackend.blog.mapper.PostMapper;
 import com.myblogbackend.blog.mapper.UserMapper;
-import com.myblogbackend.blog.models.CommentEntity;
 import com.myblogbackend.blog.models.FavoriteEntity;
 import com.myblogbackend.blog.pagination.OffsetPageRequest;
 import com.myblogbackend.blog.pagination.PaginationPage;
@@ -24,8 +23,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
