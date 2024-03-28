@@ -14,6 +14,7 @@ import com.myblogbackend.blog.repositories.PostRepository;
 import com.myblogbackend.blog.repositories.UsersRepository;
 import com.myblogbackend.blog.request.PostRequest;
 import com.myblogbackend.blog.response.PostResponse;
+import com.myblogbackend.blog.response.UserLikedPostResponse;
 import com.myblogbackend.blog.services.PostService;
 import com.myblogbackend.blog.utils.GsonUtils;
 import com.myblogbackend.blog.utils.JWTSecurityUtil;
@@ -23,6 +24,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -58,23 +60,12 @@ public class PostServiceImpl implements PostService {
         var pageable = new OffsetPageRequest(offset, limited);
         var postEntities = postRepository.findAllByUserIdAndStatusTrueOrderByCreatedDateDesc(signedInUser.getId(), pageable);
 
-        var postResponses = postEntities.getContent().stream()
+        var postResponses = postEntities.getContent().parallelStream()
                 .map(postMapper::toPostResponse)
                 .peek(postResponse -> {
-                    var favoriteEntities = favoriteRepository.findAllByPostId(postResponse.getId());
-                    // Fetch users who liked the post
-                    var userLikedPosts = favoriteEntities.stream()
-                            .map(FavoriteEntity::getUser)
-                            .map(userMapper::toUserResponse)
-                            .collect(Collectors.toList());
+                    var userLikedPosts = fetchUsersWhoLikedPost(postResponse.getId());
                     postResponse.setUsersLikedPost(userLikedPosts);
-                    // Set favorite type for the signed-in user
-                    var favoriteEntityOpt = favoriteRepository.findByUserIdAndPostId(signedInUser.getId(), postResponse.getId());
-                    var ratingType = favoriteEntityOpt
-                            .map(FavoriteEntity::getType)
-                            .map(type -> RatingType.valueOf(type.name()))
-                            .orElse(RatingType.UNLIKE);
-                    postResponse.setFavoriteType(ratingType);
+                    setFavoriteTypeForPost(signedInUser.getId(), postResponse);
                 })
                 .collect(Collectors.toList());
 
@@ -112,16 +103,13 @@ public class PostServiceImpl implements PostService {
         var postResponses = postEntities.getContent().stream()
                 .map(postEntity -> {
                     var postResponse = postMapper.toPostResponse(postEntity);
-
                     // Fetch all favorites for this post
                     var favoriteEntities = favoriteRepository.findAllByPostId(postEntity.getId());
-
                     // Fetch users who liked the post
                     var userLikedPosts = favoriteEntities.stream()
                             .map(FavoriteEntity::getUser)
                             .map(userMapper::toUserResponse)
                             .toList();
-
                     postResponse.setUsersLikedPost(userLikedPosts);
                     // Set favorite type for the signed-in user
                     var favoriteEntityOpt = favoriteRepository.findByUserIdAndPostId(signedInUser.getId(), postEntity.getId());
@@ -130,7 +118,6 @@ public class PostServiceImpl implements PostService {
                             .map(type -> RatingType.valueOf(type.name()))
                             .orElse(RatingType.UNLIKE);
                     postResponse.setFavoriteType(ratingType);
-
                     return postResponse;
                 })
                 .collect(Collectors.toList());
@@ -172,5 +159,21 @@ public class PostServiceImpl implements PostService {
         logger.error("Get post successfully by id {} ", id);
         return postMapper.toPostResponse(post);
 
+    }
+    private List<UserLikedPostResponse> fetchUsersWhoLikedPost(final UUID postId) {
+        var favoriteEntities = favoriteRepository.findAllByPostId(postId);
+        return favoriteEntities.parallelStream()
+                .map(FavoriteEntity::getUser)
+                .map(userMapper::toUserResponse)
+                .collect(Collectors.toList());
+    }
+
+    private void setFavoriteTypeForPost(final UUID userId, final PostResponse postResponse) {
+        var favoriteEntityOpt = favoriteRepository.findByUserIdAndPostId(userId, postResponse.getId());
+        var ratingType = favoriteEntityOpt
+                .map(FavoriteEntity::getType)
+                .map(type -> RatingType.valueOf(type.name()))
+                .orElse(RatingType.UNLIKE);
+        postResponse.setFavoriteType(ratingType);
     }
 }
