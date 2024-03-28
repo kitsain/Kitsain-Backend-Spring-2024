@@ -4,6 +4,7 @@ import com.myblogbackend.blog.enums.RatingType;
 import com.myblogbackend.blog.exception.commons.BlogRuntimeException;
 import com.myblogbackend.blog.exception.commons.ErrorCode;
 import com.myblogbackend.blog.mapper.PostMapper;
+import com.myblogbackend.blog.mapper.UserMapper;
 import com.myblogbackend.blog.models.CommentEntity;
 import com.myblogbackend.blog.models.FavoriteEntity;
 import com.myblogbackend.blog.pagination.OffsetPageRequest;
@@ -37,23 +38,21 @@ public class PostServiceImpl implements PostService {
     private final PostMapper postMapper;
     private final CommentRepository commentRepository;
     private final FavoriteRepository favoriteRepository;
+    private final UserMapper userMapper;
 
     @Transactional
     @Override
     public PostResponse createPost(final PostRequest postRequest) {
-        try {
-            var signedInUser = JWTSecurityUtil.getJWTUserInfo().orElseThrow();
-            var postEntity = postMapper.toPostEntity(postRequest);
-            postEntity.setUser(usersRepository.findById(signedInUser.getId()).orElseThrow());
-            postEntity.setStatus(true);
-            postEntity.setFavourite(0L);
-            var createdPost = postRepository.save(postEntity);
-            logger.info("Post was created with id: {}", createdPost.getId());
-            return postMapper.toPostResponse(createdPost);
-        } catch (Exception e) {
-            logger.error("Failed to create post", e);
-            throw new RuntimeException("Failed to create post testing");
-        }
+        var signedInUser = JWTSecurityUtil.getJWTUserInfo().orElseThrow();
+        var postEntity = postMapper.toPostEntity(postRequest);
+        postEntity.setUser(usersRepository.findById(signedInUser.getId()).orElseThrow());
+        postEntity.setStatus(true);
+        postEntity.setFavourite(0L);
+        postEntity.setCreatedBy(signedInUser.getName());
+        var createdPost = postRepository.save(postEntity);
+        logger.info("Post was created with id: {}", createdPost.getId());
+        return postMapper.toPostResponse(createdPost);
+
     }
 
     @Override
@@ -65,8 +64,15 @@ public class PostServiceImpl implements PostService {
         var postResponses = postEntities.getContent().stream()
                 .map(postMapper::toPostResponse)
                 .peek(postResponse -> {
-                    var favoriteEntityOpt = favoriteRepository
-                            .findByUserIdAndPostId(signedInUser.getId(), postResponse.getId());
+                    var favoriteEntities = favoriteRepository.findAllByPostId(postResponse.getId());
+                    // Fetch users who liked the post
+                    var userLikedPosts = favoriteEntities.stream()
+                            .map(FavoriteEntity::getUser)
+                            .map(userMapper::toUserResponse)
+                            .collect(Collectors.toList());
+                    postResponse.setUsersLikedPost(userLikedPosts);
+                    // Set favorite type for the signed-in user
+                    var favoriteEntityOpt = favoriteRepository.findByUserIdAndPostId(signedInUser.getId(), postResponse.getId());
                     var ratingType = favoriteEntityOpt
                             .map(FavoriteEntity::getType)
                             .map(type -> RatingType.valueOf(type.name()))
@@ -86,22 +92,18 @@ public class PostServiceImpl implements PostService {
     @Transactional
     @Override
     public PostResponse updatePost(final UUID postId, final PostRequest postRequest) {
-        try {
-            var post = postRepository
-                    .findById(postId)
-                    .orElseThrow(() -> new BlogRuntimeException(ErrorCode.ID_NOT_FOUND));
-            post.setTitle(postRequest.getTitle());
-            post.setDescription(postRequest.getDescription());
-            post.setPrice(postRequest.getPrice());
-            post.setImages(GsonUtils.arrayToString(postRequest.getImages()));
-            post.setExpringDate(postRequest.getExpringDate());
-            var updatedPost = postRepository.save(post);
-            logger.info("Updated post with id: {}", updatedPost.getId());
-            return postMapper.toPostResponse(updatedPost);
-        } catch (Exception e) {
-            logger.error("Failed to update post", e);
-            throw new RuntimeException("Failed to updated post testing");
-        }
+        var post = postRepository
+                .findById(postId)
+                .orElseThrow(() -> new BlogRuntimeException(ErrorCode.ID_NOT_FOUND));
+        post.setTitle(postRequest.getTitle());
+        post.setDescription(postRequest.getDescription());
+        post.setPrice(postRequest.getPrice());
+        post.setImages(GsonUtils.arrayToString(postRequest.getImages()));
+        post.setExpringDate(postRequest.getExpringDate());
+        var updatedPost = postRepository.save(post);
+        logger.info("Updated post with id: {}", updatedPost.getId());
+        return postMapper.toPostResponse(updatedPost);
+
     }
 
     @Override
@@ -113,14 +115,25 @@ public class PostServiceImpl implements PostService {
         var postResponses = postEntities.getContent().stream()
                 .map(postEntity -> {
                     PostResponse postResponse = postMapper.toPostResponse(postEntity);
+
+                    // Fetch all favorites for this post
+                    List<FavoriteEntity> favoriteEntities = favoriteRepository.findAllByPostId(postEntity.getId());
+
+                    // Fetch users who liked the post
+                    var userLikedPosts = favoriteEntities.stream()
+                            .map(FavoriteEntity::getUser)
+                            .map(userMapper::toUserResponse)
+                            .collect(Collectors.toList());
+
+                    postResponse.setUsersLikedPost(userLikedPosts);
+                    // Set favorite type for the signed-in user
                     Optional<FavoriteEntity> favoriteEntityOpt = favoriteRepository.findByUserIdAndPostId(signedInUser.getId(), postEntity.getId());
-                    if (favoriteEntityOpt.isPresent()) {
-                        var ratingType = favoriteEntityOpt.get().getType() != null ?
-                                RatingType.valueOf(favoriteEntityOpt.get().getType().name()) : RatingType.UNLIKE;
-                        postResponse.setFavoriteType(ratingType);
-                    } else {
-                        postResponse.setFavoriteType(RatingType.UNLIKE);
-                    }
+                    var ratingType = favoriteEntityOpt
+                            .map(FavoriteEntity::getType)
+                            .map(type -> RatingType.valueOf(type.name()))
+                            .orElse(RatingType.UNLIKE);
+                    postResponse.setFavoriteType(ratingType);
+
                     return postResponse;
                 })
                 .collect(Collectors.toList());
@@ -136,27 +149,22 @@ public class PostServiceImpl implements PostService {
     @Transactional
     @Override
     public void disablePost(final UUID postId) {
-        try {
-            var post = postRepository
-                    .findById(postId)
-                    .orElseThrow(() -> new BlogRuntimeException(ErrorCode.ID_NOT_FOUND));
+        var post = postRepository
+                .findById(postId)
+                .orElseThrow(() -> new BlogRuntimeException(ErrorCode.ID_NOT_FOUND));
 
-            logger.info("Disabling post successfully by id {}", postId);
-            post.setStatus(false);
-            postRepository.save(post);
-            // Disable all comments following this post
-            List<CommentEntity> comments = commentRepository.findByPostId(postId);
-            comments.stream()
-                    .filter(comment -> comment.getPost().getId().equals(postId))
-                    .forEach(comment -> {
-                        comment.setStatus(false);
-                        commentRepository.save(comment);
-                    });
-            logger.info("Disabled post and associated comments successfully");
-        } catch (Exception e) {
-            logger.error("Failed to disable post by id {}", postId, e);
-            throw new RuntimeException("Failed to disable post by id " + postId);
-        }
+        logger.info("Disabling post successfully by id {}", postId);
+        post.setStatus(false);
+        postRepository.save(post);
+        // Disable all comments following this post
+        List<CommentEntity> comments = commentRepository.findByPostId(postId);
+        comments.stream()
+                .filter(comment -> comment.getPost().getId().equals(postId))
+                .forEach(comment -> {
+                    comment.setStatus(false);
+                    commentRepository.save(comment);
+                });
+        logger.info("Disabled post and associated comments successfully");
     }
 
     @Override

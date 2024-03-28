@@ -16,6 +16,7 @@ public interface PostMapper {
     PostEntity toPostEntity(PostRequest postRequest);
 
     @Mapping(target = "images", source = "images", qualifiedByName = "mapImagesInformation")
+//    @Mapping(target = "user.name", source = "createdBy")
     PostResponse toPostResponse(PostEntity postEntity);
 
     List<PostResponse> toListPostResponse(List<PostEntity> postEntityList);

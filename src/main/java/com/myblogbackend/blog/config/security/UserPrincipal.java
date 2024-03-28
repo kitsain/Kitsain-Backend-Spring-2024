@@ -28,17 +28,19 @@ public class UserPrincipal implements OAuth2User, UserDetails {
         return userPrincipal;
     }
 
-    public UserPrincipal(final UUID id, final String email, final String password) {
+    public UserPrincipal(final UUID id, final String email, final String password, final String name) {
         this.id = id;
         this.email = email;
         this.password = password;
+        this.name = name;
     }
 
     public static UserPrincipal build(final UserEntity userEntity) {
         return new UserPrincipal(
                 userEntity.getId(),
                 userEntity.getEmail(),
-                userEntity.getPassword()
+                userEntity.getPassword(),
+                userEntity.getName()
         );
     }
 

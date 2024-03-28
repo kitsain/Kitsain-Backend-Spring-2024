@@ -59,6 +59,9 @@ public class UserEntity extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<CommentEntity> comments;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<PostEntity> posts;
+
 
     public void activate() {
         this.active = true;
