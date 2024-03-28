@@ -1,0 +1,2 @@
+ALTER TABLE favorites
+    ADD COLUMN type VARCHAR(20);

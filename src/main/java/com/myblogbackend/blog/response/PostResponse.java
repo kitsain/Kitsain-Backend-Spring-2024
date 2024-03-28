@@ -1,5 +1,6 @@
 package com.myblogbackend.blog.response;
 
+import com.myblogbackend.blog.enums.RatingType;
 import lombok.*;
 
 import java.util.Date;
@@ -19,5 +20,6 @@ public class PostResponse {
     private String price;
     private Date expringDate;
     private Long favourite = 0L;
+    private RatingType favoriteType;
     private UserResponse user;
 }

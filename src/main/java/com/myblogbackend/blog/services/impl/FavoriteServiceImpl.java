@@ -1,5 +1,6 @@
 package com.myblogbackend.blog.services.impl;
 
+import com.myblogbackend.blog.enums.RatingType;
 import com.myblogbackend.blog.exception.commons.BlogRuntimeException;
 import com.myblogbackend.blog.exception.commons.ErrorCode;
 import com.myblogbackend.blog.models.FavoriteEntity;
@@ -38,6 +39,7 @@ public class FavoriteServiceImpl implements FavoriteService {
             favoriteRepository.save(
                     FavoriteEntity.builder()
                             .user(UserEntity.builder().id(signedInUser.getId()).build())
+                            .type(RatingType.LIKE)
                             .post(post)
                             .build()
             );

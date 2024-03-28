@@ -1,13 +1,15 @@
 package com.myblogbackend.blog.services.impl;
 
+import com.myblogbackend.blog.enums.RatingType;
 import com.myblogbackend.blog.exception.commons.BlogRuntimeException;
 import com.myblogbackend.blog.exception.commons.ErrorCode;
 import com.myblogbackend.blog.mapper.PostMapper;
 import com.myblogbackend.blog.models.CommentEntity;
-import com.myblogbackend.blog.models.PostEntity;
+import com.myblogbackend.blog.models.FavoriteEntity;
 import com.myblogbackend.blog.pagination.OffsetPageRequest;
 import com.myblogbackend.blog.pagination.PaginationPage;
 import com.myblogbackend.blog.repositories.CommentRepository;
+import com.myblogbackend.blog.repositories.FavoriteRepository;
 import com.myblogbackend.blog.repositories.PostRepository;
 import com.myblogbackend.blog.repositories.UsersRepository;
 import com.myblogbackend.blog.request.PostRequest;
@@ -18,11 +20,11 @@ import com.myblogbackend.blog.utils.JWTSecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -34,6 +36,7 @@ public class PostServiceImpl implements PostService {
     private final UsersRepository usersRepository;
     private final PostMapper postMapper;
     private final CommentRepository commentRepository;
+    private final FavoriteRepository favoriteRepository;
 
     @Transactional
     @Override
@@ -55,16 +58,29 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PaginationPage<PostResponse> getAllPostsByUserId(final Integer offset, final Integer limited) {
-        try {
-            var signedInUser = JWTSecurityUtil.getJWTUserInfo().orElseThrow();
-            var pageable = new OffsetPageRequest(offset, limited);
-            var postEntities = postRepository.findAllByUserIdAndStatusTrue(signedInUser.getId(), pageable);
-            logger.info("Post get succeeded with offset: {} and limited {}", postEntities.getNumber(), postEntities.getSize());
-            return getPostResponsePaginationPage(postEntities);
-        } catch (Exception e) {
-            logger.error("Failed to get list post", e);
-            throw new RuntimeException("Failed to get list post");
-        }
+        var signedInUser = JWTSecurityUtil.getJWTUserInfo().orElseThrow();
+        var pageable = new OffsetPageRequest(offset, limited);
+        var postEntities = postRepository.findAllByUserIdAndStatusTrueOrderByCreatedDateDesc(signedInUser.getId(), pageable);
+
+        var postResponses = postEntities.getContent().stream()
+                .map(postMapper::toPostResponse)
+                .peek(postResponse -> {
+                    var favoriteEntityOpt = favoriteRepository
+                            .findByUserIdAndPostId(signedInUser.getId(), postResponse.getId());
+                    var ratingType = favoriteEntityOpt
+                            .map(FavoriteEntity::getType)
+                            .map(type -> RatingType.valueOf(type.name()))
+                            .orElse(RatingType.UNLIKE);
+                    postResponse.setFavoriteType(ratingType);
+                })
+                .collect(Collectors.toList());
+
+        logger.info("Post get succeeded with offset: {} and limited {}", postEntities.getNumber(), postEntities.getSize());
+        return new PaginationPage<PostResponse>()
+                .setRecords(postResponses)
+                .setOffset(postEntities.getNumber())
+                .setLimit(postEntities.getSize())
+                .setTotalRecords(postEntities.getTotalElements());
     }
 
     @Transactional
@@ -90,15 +106,31 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PaginationPage<PostResponse> getAllPostOrderByCreated(final Integer offset, final Integer limited) {
-        try {
-            var pageable = new OffsetPageRequest(offset, limited);
-            var postEntities = postRepository.findAllByStatusTrueOrderByCreatedDateDesc(pageable);
-            logger.info("Get feed list succeeded with offset: {} and limited {}", postEntities.getNumber(), postEntities.getSize());
-            return getPostResponsePaginationPage(postEntities);
-        } catch (Exception e) {
-            logger.error("Failed to get feed list", e);
-            throw new RuntimeException("Failed to get feed list");
-        }
+        var signedInUser = JWTSecurityUtil.getJWTUserInfo().orElseThrow();
+        var pageable = new OffsetPageRequest(offset, limited);
+        var postEntities = postRepository.findAllByStatusTrueOrderByCreatedDateDesc(pageable);
+
+        var postResponses = postEntities.getContent().stream()
+                .map(postEntity -> {
+                    PostResponse postResponse = postMapper.toPostResponse(postEntity);
+                    Optional<FavoriteEntity> favoriteEntityOpt = favoriteRepository.findByUserIdAndPostId(signedInUser.getId(), postEntity.getId());
+                    if (favoriteEntityOpt.isPresent()) {
+                        var ratingType = favoriteEntityOpt.get().getType() != null ?
+                                RatingType.valueOf(favoriteEntityOpt.get().getType().name()) : RatingType.UNLIKE;
+                        postResponse.setFavoriteType(ratingType);
+                    } else {
+                        postResponse.setFavoriteType(RatingType.UNLIKE);
+                    }
+                    return postResponse;
+                })
+                .collect(Collectors.toList());
+
+        logger.info("Get feed list succeeded with offset: {} and limited {}", postEntities.getNumber(), postEntities.getSize());
+        return new PaginationPage<PostResponse>()
+                .setRecords(postResponses)
+                .setOffset(postEntities.getNumber())
+                .setLimit(postEntities.getSize())
+                .setTotalRecords(postEntities.getTotalElements());
     }
 
     @Transactional
@@ -129,26 +161,11 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostResponse getPostById(final UUID id) {
-        try {
-            var post = postRepository
-                    .findById(id)
-                    .orElseThrow(() -> new BlogRuntimeException(ErrorCode.ID_NOT_FOUND));
-            logger.error("Get post successfully by id {} ", id);
-            return postMapper.toPostResponse(post);
-        } catch (Exception e) {
-            logger.error("Failed to get post by id", e);
-            throw new RuntimeException("Failed to get post by id");
-        }
-    }
+        var post = postRepository
+                .findById(id)
+                .orElseThrow(() -> new BlogRuntimeException(ErrorCode.ID_NOT_FOUND));
+        logger.error("Get post successfully by id {} ", id);
+        return postMapper.toPostResponse(post);
 
-    private PaginationPage<PostResponse> getPostResponsePaginationPage(final Page<PostEntity> postEntities) {
-        var postResponses = postEntities.getContent().stream()
-                .map(postMapper::toPostResponse)
-                .collect(Collectors.toList());
-        return new PaginationPage<PostResponse>()
-                .setRecords(postResponses)
-                .setOffset(postEntities.getNumber())
-                .setLimit(postEntities.getSize())
-                .setTotalRecords(postEntities.getTotalElements());
     }
 }
